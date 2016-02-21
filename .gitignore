@@ -3,3 +3,4 @@
 *.json
 *~
 credentials
+data.db

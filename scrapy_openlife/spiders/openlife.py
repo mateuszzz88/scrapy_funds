@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-import scrapy
-import re
 import datetime
+import re
+
 from scrapy_openlife.items import *
+
 PATT_DATE = re.compile(r'\d\d\d\d-\d\d-\d\d')
 
 
@@ -34,8 +35,7 @@ class OpenlifeSpider(scrapy.Spider):
     def on_policy_list(self, response):
         policyurl = response.xpath("//a[contains(@href, 'idPolicy')]/@href").extract()[0]
         policyurl = response.urljoin(policyurl)
-        self.date_from = response.xpath("//table/tbody/tr/td[4]/text()")[0].extract().strip()
-        self.date_from = "2016-01-01"
+        self.date_from = self.get_last_date(response)
         yield scrapy.Request(policyurl, callback=self.do_policy)
 
 
@@ -66,6 +66,22 @@ class OpenlifeSpider(scrapy.Spider):
             item['currency'] = currency
             item['pricedate'] = pricedate
             yield item
+
+    def get_last_date(self, response):
+        import sqlite3
+        try:
+            con = sqlite3.connect('data.db')
+            cur = con.execute("select max(pricedate) from datapoints")
+            date = cur.fetchone()[0]
+            con.close()
+
+            date = datetime.datetime.strptime(date, "%Y-%m-%d").date() + datetime.timedelta(1)
+            date = date.strftime("%Y-%m-%d")
+        except:
+            date = response.xpath("//table/tbody/tr/td[4]/text()")[0].extract().strip()
+        # self.date_from = "2016-02-01"
+        return date
+
 
 def daterange(start_date, end_date):
     from datetime import timedelta
