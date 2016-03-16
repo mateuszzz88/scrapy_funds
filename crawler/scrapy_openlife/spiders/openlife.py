@@ -2,7 +2,7 @@
 import datetime
 import re
 
-from scrapy_openlife.items import *
+from crawler.scrapy_openlife.items import *
 
 PATT_DATE = re.compile(r'\d\d\d\d-\d\d-\d\d')
 

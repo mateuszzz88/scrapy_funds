@@ -11,8 +11,8 @@
 
 BOT_NAME = 'scrapy_openlife'
 
-SPIDER_MODULES = ['scrapy_openlife.spiders']
-NEWSPIDER_MODULE = 'scrapy_openlife.spiders'
+SPIDER_MODULES = ['crawler.scrapy_openlife.spiders']
+NEWSPIDER_MODULE = 'crawler.scrapy_openlife.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
@@ -64,7 +64,9 @@ CONCURRENT_REQUESTS_PER_DOMAIN=16
 #ITEM_PIPELINES = {
 #    'scrapy_openlife.pipelines.SomePipeline': 300,
 #}
-ITEM_PIPELINES = {'scrapy_openlife.pipelines.DbPipeline': 300}
+ITEM_PIPELINES = {'crawler.scrapy_openlife.pipelines.DbPipeline': 300,
+                  'crawler.scrapy_openlife.pipelines.DjangoDbPipeline': 200
+                  }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html
