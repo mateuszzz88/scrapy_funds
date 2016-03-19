@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import DataPoint, InvestmentFund
+
+admin.site.register(DataPoint)
+admin.site.register(InvestmentFund)
