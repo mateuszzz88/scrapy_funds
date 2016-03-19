@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Funds summary</title>
+</head>
+<body>
+Following funds have some history:
+<ul>
+     {% for fund in funds_list %}
+        <li><a href="/raport/{{ fund.id }}/">{{ fund.name }}</a></li>
+    {% endfor %}
+</ul>
+</body>
+</html>
