@@ -1,0 +1,49 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ fund_name }}</title>
+
+    {% load staticfiles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'raport/fund_details.css' %}" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="http://mkoryak.github.io/floatThead/dist/jquery.floatThead.js"></script>
+    <script>
+    $(document).ready(function(){
+        $('table').floatThead({
+            position: 'absolute'
+        });
+    });
+    </script>
+</head>
+
+
+<body>
+<h1>{{ fund_name }}</h1>
+
+<table>
+    <thead>
+    <tr>
+        <th>Date</th>
+        <th>Total value</th>
+        <th>Amount</th>
+        <th>Unit price</th>
+    </tr>
+    </thead>
+        {% for data_point in data_list %}
+        <tr>
+            <td>{{data_point.price_date}}</td>
+            <td>{{data_point.value}}</td>
+            <td>{{data_point.amount}}</td>
+            <td>{{data_point.unit_price}}</td>
+        </tr>
+        {% endfor %}
+</table>
+
+
+<script type="text/javascript">
+
+</script>
+</body>
+</html>

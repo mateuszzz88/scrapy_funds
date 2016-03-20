@@ -11,8 +11,8 @@ def index(request):
 
 
 def fund_details(request, fund_id):
-    # question = get_object_or_404(Question, pk=question_id)
-    # return render(request, 'polls/detail.html', {'question': question})
-
-    response = "You're looking at the details of fund %s." % fund_id
-    return HttpResponse(response)
+    fundobj = get_object_or_404(InvestmentFund, pk=fund_id)
+    data_list = DataPoint.objects.filter(fund=fundobj).order_by('-price_date')
+    context = {'fund_name': fundobj.name,
+               'data_list': data_list}
+    return render(request, 'raport/fund_details.html', context)
