@@ -22,6 +22,90 @@
 <body>
 <h1>{{ fund_name }}</h1>
 
+
+
+
+
+
+<!-- amCharts javascript sources -->
+<script src="http://www.amcharts.com/lib/3/amcharts.js" type="text/javascript"></script>
+<script src="http://www.amcharts.com/lib/3/serial.js" type="text/javascript"></script>
+
+<!-- amCharts javascript code -->
+<script type="text/javascript">
+    var data = [
+                {% for data_point in data_list reversed %}
+                    { "date" : "{{data_point.price_date|date:"Y-m-d"}}",
+                    "unit_price" : {{data_point.unit_price}} ,
+                    "value" : {{data_point.value}} ,
+                    "return_percent" : ({{data_point.unit_price}}*100/{{data_list.last.unit_price}}).toFixed(2) },
+                {% endfor %}
+            ]
+    AmCharts.makeChart("chart1",
+        {
+            "type": "serial",
+            "categoryField": "date",
+            "dataDateFormat": "YYYY-MM-DD",
+            "categoryAxis": {
+                "parseDates": true
+            },
+            "chartCursor": {
+                "enabled": true
+            },
+            "chartScrollbar": {
+                "enabled": true
+            },
+            "trendLines": [],
+            "graphs": [
+                {
+                    "bullet": "none",
+                    "id": "AmGraph-1",
+                    "title": "Unit relative [%]",
+                    "valueField": "return_percent",
+                    "valueAxis":"ValueAxis-1"
+                },
+                {
+                    "bullet": "none",
+                    "id": "AmGraph-2",
+                    "title": "Total value [{{data_list.0.currency}}]",
+                    "valueField": "value",
+                    "valueAxis":"ValueAxis-2"
+                }
+            ],
+            "guides": [],
+            "valueAxes": [
+                {
+                    "id": "ValueAxis-1",
+                    "title": "Unit value relative to day 1 [%]",
+                    "position": "left"
+                },
+                {
+                    "id": "ValueAxis-2",
+                    "title": "Total value [{{data_list.0.currency}}]",
+                    "position": "right"
+                }
+            ],
+            "allLabels": [],
+            "balloon": {},
+            "legend": {
+                "enabled": true,
+                "useGraphSettings": true
+            },
+            "titles": [
+                {
+                    "id": "Title-1",
+                    "size": 15,
+                    "text": "Unit return, total value"
+                }
+            ],
+            "dataProvider": data
+        }
+    );
+</script>
+<div id="chart1" style="width: 100%; height: 400px; background-color: #FFFFFF;" ></div>
+
+
+
 <table>
     <thead>
     <tr>
@@ -42,8 +126,25 @@
 </table>
 
 
-<script type="text/javascript">
-
-</script>
 </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>chart created with amCharts | amCharts</title>
+		<meta name="description" content="chart created using amCharts live editor" />
+
+	</head>
+	<body>
+	</body>
 </html>
