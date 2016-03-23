@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # http://doc.scrapy.org/en/latest/topics/practices.html
 
-import fundsraport.settings
+import fundsreport.settings
 import django, django.conf
-djangosettingsdict = {key:value for (key, value) in fundsraport.settings.__dict__.iteritems() if '__' not in key}
+djangosettingsdict = {key:value for (key, value) in fundsreport.settings.__dict__.iteritems() if '__' not in key}
 django.conf.settings.configure(django.conf.global_settings, **djangosettingsdict)
 django.setup()
 

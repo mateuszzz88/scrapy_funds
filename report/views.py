@@ -21,7 +21,7 @@ def index(request):
     funds_list = InvestmentFund.objects.all()
     funds_list = sorted(funds_list, cmp=cmpfun)
     context = {'funds_list': funds_list}
-    return render(request, 'raport/index.html', context)
+    return render(request, 'report/index.html', context)
 
 
 def fund_details(request, fund_id):
@@ -29,4 +29,4 @@ def fund_details(request, fund_id):
     data_list = DataPoint.objects.filter(fund=fundobj).order_by('-price_date')
     context = {'fund_name': fundobj.name,
                'data_list': data_list}
-    return render(request, 'raport/fund_details.html', context)
+    return render(request, 'report/fund_details.html', context)

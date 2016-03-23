@@ -14,7 +14,7 @@ Following funds have some history:
     </tr>
     {% for fund in funds_list %}
         <tr>
-            <td><a href="/raport/{{ fund.id }}/">{{ fund.name }}</a></td>
+            <td><a href="/report/{{ fund.id }}/">{{ fund.name }}</a></td>
             <td>{{ fund.edge_datapoints.0.price_date | date:"Y-m-d" }}</td>
             <td>{{ fund.edge_datapoints.1.price_date | date:"Y-m-d" }}</td>
         </tr>
