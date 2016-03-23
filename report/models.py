@@ -29,3 +29,7 @@ class DataPoint(models.Model):
     def __str__(self):
         return "%s @ %s" % (self.fund.name, self.price_date)
 
+    @staticmethod
+    def latest_date(cls):
+        last = cls.objects.order_by('-price_date').first()
+        return last.price_date

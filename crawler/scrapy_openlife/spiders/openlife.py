@@ -68,18 +68,13 @@ class OpenlifeSpider(scrapy.Spider):
             yield item
 
     def get_last_date(self, response):
-        import sqlite3
+        from report.models import DataPoint
         try:
-            con = sqlite3.connect('data.db')
-            cur = con.execute("select max(pricedate) from datapoints")
-            date = cur.fetchone()[0]
-            con.close()
-
+            date = DataPoint.latest_date()
             date = datetime.datetime.strptime(date, "%Y-%m-%d").date() + datetime.timedelta(1)
             date = date.strftime("%Y-%m-%d")
         except:
             date = response.xpath("//table/tbody/tr/td[4]/text()")[0].extract().strip()
-        # self.date_from = "2016-02-01"
         return date
 
 

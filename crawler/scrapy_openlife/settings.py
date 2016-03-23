@@ -64,8 +64,7 @@ CONCURRENT_REQUESTS_PER_DOMAIN=16
 #ITEM_PIPELINES = {
 #    'scrapy_openlife.pipelines.SomePipeline': 300,
 #}
-ITEM_PIPELINES = {'crawler.scrapy_openlife.pipelines.DbPipeline': 300,
-                  'crawler.scrapy_openlife.pipelines.DjangoDbPipeline': 200
+ITEM_PIPELINES = {'crawler.scrapy_openlife.pipelines.DjangoDbPipeline': 200
                   }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
