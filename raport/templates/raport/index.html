@@ -6,10 +6,19 @@
 </head>
 <body>
 Following funds have some history:
-<ul>
-     {% for fund in funds_list %}
-        <li><a href="/raport/{{ fund.id }}/">{{ fund.name }}</a></li>
+<table>
+    <tr>
+        <th>fund</th>
+        <th>earliest buy</th>
+        <th>latest owned</th>
+    </tr>
+    {% for fund in funds_list %}
+        <tr>
+            <td><a href="/raport/{{ fund.id }}/">{{ fund.name }}</a></td>
+            <td>{{ fund.edge_datapoints.0.price_date | date:"Y-m-d" }}</td>
+            <td>{{ fund.edge_datapoints.1.price_date | date:"Y-m-d" }}</td>
+        </tr>
     {% endfor %}
-</ul>
+</table>
 </body>
 </html>

@@ -5,11 +5,8 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import sqlite3
-from raport.models import InvestmentFund, DataPoint
+from raport.models import InvestmentFund
 
-class ScrapyOpenlifePipeline(object):
-    def process_item(self, item, spider):
-        return item
 
 class DbPipeline(object):
     def __init__(self):
@@ -21,7 +18,6 @@ class DbPipeline(object):
         self.con.execute("CREATE TABLE IF NOT EXISTS datapoints "
                          "(name TEXT, amount REAL, unitprice REAL, pricedate TEXT, value REAL, currency TEXT,"
                          "UNIQUE (name, pricedate))")
-
 
     def close_spider(self, spider):
         self.con.close()
@@ -47,11 +43,11 @@ class DjangoDbPipeline(object):
         from django.db import IntegrityError
         fund, _ = InvestmentFund.objects.get_or_create(name=item['name'])
         try:
-            fund.datapoint_set.create(amount=item['amount'],
-                                      unit_price=item['unitprice'],
-                                      price_date=item['pricedate'],
-                                      value=item['value'],
-                                      currency=item['currency'])
+            dp = fund.datapoint_set.create(amount=item['amount'],
+                                           unit_price=item['unitprice'],
+                                           price_date=item['pricedate'],
+                                           value=item['value'],
+                                           currency=item['currency'])
         except IntegrityError:
             pass
         return item
