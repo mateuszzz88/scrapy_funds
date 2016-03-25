@@ -20,7 +20,16 @@ def index(request):
 
     funds_list = InvestmentFund.objects.all()
     funds_list = sorted(funds_list, cmp=cmpfun)
-    context = {'funds_list': funds_list}
+
+    import collections
+    data = collections.defaultdict(dict)
+    for dp in DataPoint.objects.all():
+        data[dp.price_date][dp.fund.name] = dp.value
+    data = sorted(data.items())
+
+    context = {'funds_list': funds_list,
+               'data': data
+               }
     return render(request, 'report/index.html', context)
 
 
