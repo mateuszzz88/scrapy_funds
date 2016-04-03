@@ -17,3 +17,10 @@ class ScrapyOpenlifeItem(scrapy.Item):
     pricedate = scrapy.Field()
     value = scrapy.Field()
     currency = scrapy.Field()
+
+class ScrapyOpenlifeHistoryItem(scrapy.Item):
+    id = scrapy.Field()
+    amount = scrapy.Field()
+    type = scrapy.Field()
+    date = scrapy.Field()
+

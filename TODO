@@ -2,3 +2,5 @@ index: show total amount of paid money on graph
 multiple openlife accounts
 axa account
 run crawler from page
+faster crawl of account_history (somehow do not iterate over all pages)
+faster crawl when nothing new (check last date given and iterate to this, not to today)

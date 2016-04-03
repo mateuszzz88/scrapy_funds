@@ -29,7 +29,21 @@ class DataPoint(models.Model):
     def __str__(self):
         return "%s @ %s" % (self.fund.name, self.price_date)
 
-    @staticmethod
+    @classmethod
     def latest_date(cls):
         last = cls.objects.order_by('-price_date').first()
         return last.price_date
+
+
+class PolicyOperation(models.Model):
+    operation_id = models.IntegerField(unique=True)
+    operation_date = models.DateField()
+    operation_type = models.CharField(max_length=20)
+    operation_amount = models.FloatField(default=0)
+
+    @classmethod
+    def latest_date(cls):
+        last = cls.objects.order_by('-operation_date').first()
+        if last:
+            return last.operation_date
+        return None
