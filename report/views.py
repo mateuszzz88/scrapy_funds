@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*-
 from django.shortcuts import get_object_or_404, render
 
-from .models import InvestmentFund, DataPoint
+from .models import *
 
 def index(request):
     def cmpfun(a, b):
@@ -25,6 +26,17 @@ def index(request):
     data = collections.defaultdict(dict)
     for dp in DataPoint.objects.all():
         data[dp.price_date][dp.fund.name] = dp.value
+
+    paid_data = PolicyOperation.objects.filter(operation_type=u'Wp\u0142aty').order_by('operation_date')
+    paid_data_dates = [op.operation_date for op in paid_data]
+    paid_data_amounts = [op.operation_amount for op in paid_data]
+    paid_data_sums = [sum(paid_data_amounts[0:i+1]) for i in range(len(paid_data))]
+    paid_data = zip(paid_data_dates, paid_data_sums)
+    for date, sum_payments in paid_data:
+        data[date]['sum_payments'] = sum_payments
+    last_day = sorted(data.keys())[-1]
+    data[last_day]['sum_payments'] = paid_data_sums[-1]
+
     data = sorted(data.items())
 
     context = {'funds_list': funds_list,

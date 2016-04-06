@@ -15,6 +15,7 @@
                 {% for fund, val in datapoints.items %}"{{fund}}" : {{val}},
                 {% endfor %}
             }, {% endfor %} ]
+
         var chart = AmCharts.makeChart("chartdiv", {
             "type": "serial",
             "categoryField": "date",
@@ -43,9 +44,19 @@
                 "hidden": false,
                 "lineAlpha": 0.4,
                 "title": "{{fund.name}}",
-                "valueField": "{{fund.name}}"
+                "valueField": "{{fund.name}}",
             },
-            {%endfor%}],
+            {%endfor%}
+            {
+                "title" : "PAID",
+                "valueField": "sum_payments",
+                "lineThickness": 3,
+                "lineColor": "red",
+                "useLineColorForBulletBorder": true,
+                "balloonText": "<span style='font-size:18px;'>[[value]]</span>",
+                "type":"step"
+            }
+            ],
             "plotAreaBorderAlpha": 0,
             "marginTop": 10,
             "marginLeft": 0,
