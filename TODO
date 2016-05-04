@@ -1,7 +1,6 @@
-multiple openlife accounts
 axa account
 run crawler from cron
 run crawler from page
 faster crawl of account_history (somehow do not iterate over all pages)
 faster crawl when nothing new (check last date given and iterate to this, not to today)
-index - total amount of paid money on graph: fix total of total in legend
+index - total amount of paid money on graph: fix total of total in legend (replace "total" with "now")

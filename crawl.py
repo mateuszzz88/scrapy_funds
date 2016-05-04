@@ -3,7 +3,7 @@
 
 import fundsreport.settings
 import django, django.conf
-djangosettingsdict = {key:value for (key, value) in fundsreport.settings.__dict__.iteritems() if '__' not in key}
+djangosettingsdict = {key: value for (key, value) in fundsreport.settings.__dict__.iteritems() if '__' not in key}
 django.conf.settings.configure(django.conf.global_settings, **djangosettingsdict)
 django.setup()
 
@@ -17,4 +17,4 @@ settings.setmodule(settingsmod)
 process = CrawlerProcess(settings)
 
 process.crawl(OpenlifeSpider)
-process.start() # the script will block here until the crawling is finished
+process.start()  # the script will block here until the crawling is finished

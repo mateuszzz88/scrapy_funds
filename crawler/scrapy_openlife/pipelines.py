@@ -23,7 +23,7 @@ class DjangoDbPipeline(object):
     @staticmethod
     def process_OpenlifeItem(item):
         from django.db import IntegrityError
-        fund, _ = InvestmentFund.objects.get_or_create(name=item['name'])
+        fund, _ = InvestmentFund.objects.get_or_create(name=item['name'], policy=item['policy'])
         try:
             dp = fund.datapoint_set.create(amount=item['amount'],
                                            unit_price=item['unitprice'],
@@ -35,7 +35,10 @@ class DjangoDbPipeline(object):
 
     @staticmethod
     def process_HistoryItem(item):
+        if item['amount'] > 29000:  # TODO this is dirty hack to work around parents' multiple policies
+            return
         PolicyOperation.objects.update_or_create(operation_id=item['id'],
                                                  operation_amount=item['amount'],
                                                  operation_type=item['type'],
-                                                 operation_date=item['date'])
+                                                 operation_date=item['date'],
+                                                 policy=item['policy'])

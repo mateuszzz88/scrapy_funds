@@ -4,8 +4,8 @@ from . import views
 
 urlpatterns = [
     # ex: /report/
-    url(r'^$', views.index, name='index'),
+    url(r'^policy/(?P<policy_id>[0-9]+)/$', views.policy_details, name='policy_details'),
     # ex: /report/5/
-    url(r'^(?P<fund_id>[0-9]+)/$', views.fund_details, name='fund_details'),
+    url(r'^fund/(?P<fund_id>[0-9]+)/$', views.fund_details, name='fund_details'),
 ]
 

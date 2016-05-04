@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 import re
+from report.models import Policy
 
 from crawler.scrapy_openlife.items import *
 
@@ -13,42 +14,49 @@ class OpenlifeSpider(scrapy.Spider):
     start_urls = (
         'https://portal.openlife.pl/frontend/login.html',
     )
-    date_from = None
 
     def parse(self, response):
-        login = password = None
-        with open("credentials") as f:
-            login, password = f.readlines()
-            login, password = login.strip(), password.strip()
-        return [scrapy.FormRequest.from_response(response,
-                    formdata={'j_username': login, 'j_password': password},
-                    callback=self.after_login)]
+        for policy in Policy.objects.filter(company='openlife'):
+            login = policy.login
+            password = policy.password
+            yield scrapy.FormRequest.from_response(response,
+                                                   formdata={'j_username': login, 'j_password': password},
+                                                   callback=self.after_login,
+                                                   meta={'policy': policy, 'cookiejar':policy, 'date_from':None},
+                                                   dont_filter=True)
 
     def after_login(self, response):
         # check login succeed before going on
         if "Niepoprawny identyfikator" in response.body:
             self.log("Login failed", level=scrapy.log.ERROR)
             return
-
         yield scrapy.Request('https://portal.openlife.pl/frontend/secure/policyList.html',
-                             callback=self.on_policy_list)
+                             callback=self.on_policy_list,
+                             meta=reuse_meta(response),
+                             dont_filter=True)
 
     def on_policy_list(self, response):
-        policyurl = response.xpath("//a[contains(@href, 'idPolicy')]/@href").extract()[0]
-        policyurl = response.urljoin(policyurl)
-        self.date_from = self.get_last_date(response)
-        yield scrapy.Request(policyurl, callback=self.do_policy)
-
+        policy_url = response.xpath("//tr[td//text()[contains(., 'Plan Inwestycyjny Lepsze Jutro')]]//a[contains(@href, 'idPolicy')]/@href").extract()[0]
+        policy_url = response.urljoin(policy_url)
+        response.meta['date_from'] = self.get_last_date(response)
+        yield scrapy.Request(policy_url, callback=self.do_policy,
+                             meta=reuse_meta(response),
+                             dont_filter=True)
 
     def do_policy(self, response):
-        mindate = datetime.datetime.strptime(self.date_from, "%Y-%m-%d").date()
-        maxdate = datetime.date.today()
+        date_from = response.meta['date_from']
+        min_date = datetime.datetime.strptime(date_from, "%Y-%m-%d").date()
+        max_date = datetime.date.today()  # TODO this should be read from page/meta        max_date = datetime.date.today()  # TODO this should be read from page/meta
         yield scrapy.Request('https://portal.openlife.pl/frontend/secure/accountHistory.html',
-                             callback=self.on_account_history)
-        for day in daterange(mindate, maxdate):
+                             callback=self.on_account_history,
+                             meta=reuse_meta(response),
+                             dont_filter=True)
+        for day in daterange(min_date, max_date):
             yield scrapy.FormRequest.from_response(response,
-                    formdata={'showFromDate': day.strftime("%Y-%m-%d")},
-                    callback=self.do_policy_day)
+                                                   formdata={'showFromDate': day.strftime("%Y-%m-%d")},
+                                                   callback=self.do_policy_day,
+                                                   meta=reuse_meta(response),
+                                                   dont_filter=True)
 
     def do_policy_day(self, response):
         # for this day:
@@ -68,6 +76,7 @@ class OpenlifeSpider(scrapy.Spider):
             item['value'] = value
             item['currency'] = currency
             item['pricedate'] = pricedate
+            item['policy'] = response.meta['policy']
             yield item
 
     def get_last_date(self, response):
@@ -78,6 +87,7 @@ class OpenlifeSpider(scrapy.Spider):
             date = date.strftime("%Y-%m-%d")
         except:
             date = response.xpath("//table/tbody/tr/td[4]/text()")[0].extract().strip()
+            # on policy list: date_from = response.xpath("//div[@class='boxContent_lvl1']//tbody//td")[3].xpath('text()')[0].extract().strip()
         return date
 
     def on_account_history(self, response):
@@ -85,7 +95,9 @@ class OpenlifeSpider(scrapy.Spider):
         if nextpage:
             nextpage = nextpage[0].strip()
             nextpage = response.urljoin(nextpage)
-            yield scrapy.Request(nextpage, callback=self.on_account_history)
+            yield scrapy.Request(nextpage,
+                                 callback=self.on_account_history,
+                                 meta=reuse_meta(response))
 
         from report.models import PolicyOperation
         last_date = (PolicyOperation.latest_date() or datetime.date(year=2000, month=1, day=1)).strftime("%Y-%m-%d")
@@ -100,6 +112,7 @@ class OpenlifeSpider(scrapy.Spider):
             item['date'] = op_date
             item['type'] = op_type
             item['amount'] = op_amount
+            item['policy'] = response.meta['policy']
             yield item
 
     def debug(self, response=None, inspect=False, view=True):
@@ -111,10 +124,13 @@ class OpenlifeSpider(scrapy.Spider):
         pdb.set_trace()
 
 
-
 def daterange(start_date, end_date):
     from datetime import timedelta
     for n in range(int ((end_date - start_date).days)):
-        day =  start_date + timedelta(n)
+        day = start_date + timedelta(n)
         if day.weekday() < 5:
             yield day
+
+
+def reuse_meta(response):
+    return {key: response.meta[key] for key in ['policy', 'cookiejar', 'date_from']}

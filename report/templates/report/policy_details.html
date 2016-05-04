@@ -45,6 +45,7 @@
                 "lineAlpha": 0.4,
                 "title": "{{fund.name}}",
                 "valueField": "{{fund.name}}",
+                "connect": true,
             },
             {%endfor%}
             {
@@ -70,7 +71,7 @@
                 "axisColor": "#DADADA",
                 "gridAlpha": 0.07,
                 "title": "Year",
-                "parseDates": true
+                "parseDates": true,
             },
             "export": {
                 "enabled": true
@@ -95,7 +96,7 @@ Following funds have some history:
     </tr>
     {% for fund in funds_list %}
         <tr>
-            <td><a href="/report/{{ fund.id }}/">{{ fund.name }}</a></td>
+            <td><a href="{%url 'fund_details' fund.id %}">{{ fund.name }}</a></td>
             <td>{{ fund.edge_datapoints.0.price_date | date:"Y-m-d" }}</td>
             <td>{{ fund.edge_datapoints.1.price_date | date:"Y-m-d" }}</td>
         </tr>
