@@ -44,9 +44,11 @@ class OpenlifeSpider(scrapy.Spider):
                              dont_filter=True)
 
     def do_policy(self, response):
+        self.debug(response)
         date_from = response.meta['date_from']
         min_date = datetime.datetime.strptime(date_from, "%Y-%m-%d").date()
         max_date = datetime.date.today()  # TODO this should be read from page/meta        max_date = datetime.date.today()  # TODO this should be read from page/meta
+
         yield scrapy.Request('https://portal.openlife.pl/frontend/secure/accountHistory.html',
                              callback=self.on_account_history,
                              meta=reuse_meta(response),
@@ -82,7 +84,7 @@ class OpenlifeSpider(scrapy.Spider):
     def get_last_date(self, response):
         from report.models import DataPoint
         try:
-            date = DataPoint.latest_date()
+            date = DataPoint.latest_date(response.meta['policy'])
             date = date + datetime.timedelta(1)
             date = date.strftime("%Y-%m-%d")
         except:
@@ -100,7 +102,8 @@ class OpenlifeSpider(scrapy.Spider):
                                  meta=reuse_meta(response))
 
         from report.models import PolicyOperation
-        last_date = (PolicyOperation.latest_date() or datetime.date(year=2000, month=1, day=1)).strftime("%Y-%m-%d")
+        last_date = (PolicyOperation.latest_date(response.meta['policy'])
+                     or datetime.date(year=2000, month=1, day=1)).strftime("%Y-%m-%d")
         entries = response.xpath("//div[@class='boxContent_lvl2']/div/table/tbody/tr")
         for entry in entries:
             fields = [e.extract().strip() for e in entry.xpath('td/text()')]

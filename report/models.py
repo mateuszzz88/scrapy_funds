@@ -12,6 +12,27 @@ class Policy(models.Model):
     def __unicode__(self):
         return u"%s (%s@%s)" % (self.name, self.login, self.company)
 
+    def total_deposited(self):
+        return int(self.policyoperation_set.filter(operation_type=PolicyOperation.DEPOSIT, operation_amount__lt=30000)\
+            .aggregate(models.Sum('operation_amount'))['operation_amount__sum'] or 0)
+
+    def last_value(self):
+        funds = [fund for fund in self.investmentfund_set.all()]
+        last_days = [fund.edge_datapoints()[1].price_date for fund in funds]
+        last_day = max(last_days)
+        last_dps = DataPoint.objects.filter(fund__policy=self, price_date=last_day)
+        last_vals = [dp.value for dp in last_dps]
+        last_val = sum(last_vals)
+        # import pdb; pdb.set_trace()
+        return last_val
+
+    def clear(self):
+        for fund in self.investmentfund_set.all():
+            fund.delete()
+        for op in self.policyoperation_set.all():
+            op.delete()
+
+
 
 class InvestmentFund(models.Model):
     name = models.CharField(max_length=200)
@@ -51,7 +72,7 @@ class DataPoint(models.Model):
         funds = policy.investmentfund_set.all()
         last = sorted([fund.datapoint_set.order_by('-price_date').first().price_date for fund in funds])[-1]
         # last = cls.objects.order_by('-price_date').first()
-        return last.price_date
+        return last
 
 
 class PolicyOperation(models.Model):
@@ -65,8 +86,8 @@ class PolicyOperation(models.Model):
         unique_together = ('policy', 'operation_id')
 
     @classmethod
-    def latest_date(cls):
-        last = cls.objects.order_by('-operation_date').first()
+    def latest_date(cls, policy):
+        last = policy.policyoperation_set.order_by('-operation_date').first()
         if last:
             return last.operation_date
         return None

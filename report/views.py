@@ -46,6 +46,8 @@ def policy_details(request, policy_id):
     data = sorted(data.items())
 
     # add guards with 0 value and fill gaps in sum_payments values
+    if SUM_PAYMENTS not in data[0][1].keys():
+        data[0][1][SUM_PAYMENTS] = 0
     for idx, (day, values_dict) in enumerate(data):
         for fund, val in values_dict.items():
             if val == 0: continue
@@ -69,3 +71,10 @@ def fund_details(request,  fund_id):
     context = {'fund_name': fund.name,
                'data_list': data_list}
     return render(request, 'report/fund_details.html', context)
+
+
+def policy_list(request):
+    policies = [(policy, 0, 0) for policy in Policy.objects.all()]
+    # import pdb; pdb.set_trace()
+    context = {'policies': policies}
+    return render(request, 'report/policy_list.html', context)

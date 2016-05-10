@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Policy list</title>
+    {% load staticfiles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'report/fund_details.css' %}" />
+</head>
+<body>
+Following funds have some history:
+<table>
+    <tr>
+        <th>Policy</th>
+        <th>value</th>
+        <th>deposited</th>
+    </tr>
+    {% for policy, value, deposited in policies %}
+        <tr>
+            <td><a href="{%url 'policy_details' policy.id %}">{{ policy.name }}</a></td>
+            <td>{{ policy.last_value }}</td>
+            <td>{{ policy.total_deposited }}</td>
+        </tr>
+    {% endfor %}
+</table>
+<div id="chartdiv"></div>
+</body>
+</html>
