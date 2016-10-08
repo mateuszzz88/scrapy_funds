@@ -4,3 +4,4 @@
 *~
 credentials
 db.sqlite3
+*.log
