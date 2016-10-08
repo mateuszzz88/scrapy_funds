@@ -96,5 +96,16 @@ class PolicyOperation(models.Model):
         return u"%s @ %s(%s)" % (self.operation_type, self.operation_date, self.policy.name)
 
 
+class PolicyOperationDetail(models.Model):
+    operation = models.ForeignKey(PolicyOperation, on_delete=models.CASCADE)
+    fund = models.ForeignKey(InvestmentFund)
+    money_transfer = models.FloatField()
+
+    class Meta:
+        unique_together = ('fund', 'operation')
+
+    def __unicode__(self):
+        return self.operation.__unicode__()
+
 PolicyOperation.DEPOSIT = u'Wp\u0142aty'
 PolicyOperation.WITHDRAW = u'Wyp\u0142aty'

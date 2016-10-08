@@ -27,3 +27,10 @@ class ScrapyOpenlifeHistoryItem(scrapy.Item):
     date = scrapy.Field()
     policy = scrapy.Field()
 
+
+class ScrapyOpenlifeHistoryItemDetail(scrapy.Item):
+    op_id = scrapy.Field()
+    fund_name = scrapy.Field()
+    money_transfer = scrapy.Field()
+    policy = scrapy.Field()
+

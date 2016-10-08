@@ -4,8 +4,8 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
-from report.models import InvestmentFund, PolicyOperation
-from items import ScrapyOpenlifeHistoryItem, ScrapyOpenlifeItem
+from report.models import InvestmentFund, PolicyOperation, PolicyOperationDetail
+from items import ScrapyOpenlifeHistoryItem, ScrapyOpenlifeItem, ScrapyOpenlifeHistoryItemDetail
 import logging
 
 
@@ -16,6 +16,8 @@ class DjangoDbPipeline(object):
             self.process_OpenlifeItem(item)
         elif type(item) is ScrapyOpenlifeHistoryItem:
             self.process_HistoryItem(item)
+        elif type(item) is ScrapyOpenlifeHistoryItemDetail:
+            self.process_HistoryDetail(item)
         else:
             logging.log(logging.ERROR, "handling for unexpected item type %s" % (type(item)))
         return item
@@ -42,3 +44,13 @@ class DjangoDbPipeline(object):
                                                  operation_type=item['type'],
                                                  operation_date=item['date'],
                                                  policy=item['policy'])
+
+    @staticmethod
+    def process_HistoryDetail(item):
+        policy = item['policy']
+        fund = policy.investmentfund_set.filter(name__startswith=item['fund_name'])[0]
+        operation = PolicyOperation.objects.filter(policy=policy, operation_id=item['op_id'])[0]
+
+        PolicyOperationDetail.objects.update_or_create(operation=operation,
+                                                       fund=fund,
+                                                       money_transfer=item['money_transfer'])
