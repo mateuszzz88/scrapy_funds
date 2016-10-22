@@ -19,12 +19,15 @@ NEWSPIDER_MODULE = 'crawler.scrapy_openlife.spiders'
 #USER_AGENT = 'scrapy_openlife (+http://www.yourdomain.com)'
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS=2
+# CONCURRENT_REQUESTS=1
 
 # Configure a delay for requests for the same website (default: 0)
 # See http://scrapy.readthedocs.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-# DOWNLOAD_DELAY=1
+
+# delay makes it work slowly
+DOWNLOAD_DELAY=1
+
 # The download delay setting will honor only one of:
 CONCURRENT_REQUESTS_PER_DOMAIN=16
 #CONCURRENT_REQUESTS_PER_IP=16
@@ -49,13 +52,13 @@ CONCURRENT_REQUESTS_PER_DOMAIN=16
 
 # Enable or disable downloader middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
-DOWNLOADER_MIDDLEWARES = {
-    'crawler.scrapy_openlife.middlewares.CustomRetryMiddleware.CustomRetryMiddleware': 543,
-    'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
-    'crawler.scrapy_openlife.middlewares.CustomRetryMiddleware.CustomRedirectMiddleware': 543,
-    'scrapy.downloadermiddlewares.redirect.RedirectMiddleware': None,
-    'scrapy.downloadermiddlewares.redirect.BaseRedirectMiddleware': None
-}
+# DOWNLOADER_MIDDLEWARES = {
+#     'crawler.scrapy_openlife.middlewares.CustomRetryMiddleware.CustomRetryMiddleware': 543,
+#     'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
+#     'crawler.scrapy_openlife.middlewares.CustomRetryMiddleware.CustomRedirectMiddleware': 543,
+#     'scrapy.downloadermiddlewares.redirect.RedirectMiddleware': None,
+#     'scrapy.downloadermiddlewares.redirect.BaseRedirectMiddleware': None
+# }
 
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html
@@ -89,4 +92,4 @@ ITEM_PIPELINES = {'crawler.scrapy_openlife.pipelines.DjangoDbPipeline': 200
 #HTTPCACHE_DIR='httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES=[]
 #HTTPCACHE_STORAGE='scrapy.extensions.httpcache.FilesystemCacheStorage'
-REDIRECT_MAX_TIMES=100
+# REDIRECT_MAX_TIMES=100
