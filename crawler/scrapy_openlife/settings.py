@@ -26,7 +26,7 @@ NEWSPIDER_MODULE = 'crawler.scrapy_openlife.spiders'
 # See also autothrottle settings and docs
 
 # delay makes it work slowly
-DOWNLOAD_DELAY=1
+# DOWNLOAD_DELAY=1
 
 # The download delay setting will honor only one of:
 CONCURRENT_REQUESTS_PER_DOMAIN=16
