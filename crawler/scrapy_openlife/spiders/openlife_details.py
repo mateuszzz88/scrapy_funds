@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-import datetime
-import re
-from report.models import Policy, PolicyOperation, PolicyOperationDetail
 from collections import defaultdict
 from openlife import *
 from pprint import pprint as pp
@@ -17,9 +14,6 @@ class OpenlifeDetailsSpider(OpenlifeSpider):
     start_urls = (
         'https://portal.openlife.pl/frontend/login.html',
     )
-    # custom_settings = {
-    #     'SOME_SETTING': 'some value',
-    # }
     needed_details = defaultdict(set)
 
     def do_policy(self, response):
@@ -37,8 +31,6 @@ class OpenlifeDetailsSpider(OpenlifeSpider):
         return dct[optype]
 
     def pop_details(self, response):
-        with open('/tmp/history.txt', 'a') as fil:
-            fil.write("POP ")
         needed_set = self.needed_details[response.meta['policy']]
         if len(needed_set) == 0:
             return None
@@ -49,8 +41,6 @@ class OpenlifeDetailsSpider(OpenlifeSpider):
         meta = reuse_meta(response)
         meta['op_type'] = op_type
         meta['op_id'] = op_id
-        with open('/tmp/history.txt', 'a') as fil:
-            fil.write("POP tries %s (%s)\n" % (details_url, str(meta)))
         return scrapy.Request(details_url,
                               callback=self.on_history_details,
                               meta=meta,
@@ -98,14 +88,6 @@ class OpenlifeDetailsSpider(OpenlifeSpider):
                                  dont_filter=True)
             return
 
-        #     with open('/tmp/failed1.txt', 'a') as f:
-        #         f.write(str(response.meta['redirect_urls']) + ' -->  ' + url + '\n')
-        #     return
-        # else:
-        #     with open('/tmp/good.txt', 'a') as f:
-        #         f.write(str(response.meta['redirect_urls']) + '\n')
-
-        # OPLATA, WPLATA, PRZENIESIENIE = u'Opłata', u'Wpłaty', u'Przeniesienie'
         OPLATA, WPLATA, PRZENIESIENIE = 'charge', 'payment', 'transfer'
         if op_type == OPLATA:
             entries = response.xpath("//div/div/table/tbody/tr")

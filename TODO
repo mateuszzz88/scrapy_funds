@@ -6,3 +6,4 @@ faster crawl when nothing new (check last date given and iterate to this, not to
 index - total amount of paid money on graph: fix total of total in legend (replace "total" with "now")
 http://www.dheinemann.com/2011/archiving-with-wget/ http://www.linuxjournal.com/content/downloading-entire-web-site-wget
 use Decimal instead of float
+display details on fund page - how much money was spent on fees

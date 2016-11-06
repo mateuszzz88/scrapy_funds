@@ -52,13 +52,9 @@ CONCURRENT_REQUESTS_PER_DOMAIN=16
 
 # Enable or disable downloader middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
-# DOWNLOADER_MIDDLEWARES = {
-#     'crawler.scrapy_openlife.middlewares.CustomRetryMiddleware.CustomRetryMiddleware': 543,
-#     'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
-#     'crawler.scrapy_openlife.middlewares.CustomRetryMiddleware.CustomRedirectMiddleware': 543,
-#     'scrapy.downloadermiddlewares.redirect.RedirectMiddleware': None,
-#     'scrapy.downloadermiddlewares.redirect.BaseRedirectMiddleware': None
-# }
+#DOWNLOADER_MIDDLEWARES = {
+#    'scrapy_openlife.middlewares.MyCustomDownloaderMiddleware': 543,
+#}
 
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html
@@ -92,4 +88,3 @@ ITEM_PIPELINES = {'crawler.scrapy_openlife.pipelines.DjangoDbPipeline': 200
 #HTTPCACHE_DIR='httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES=[]
 #HTTPCACHE_STORAGE='scrapy.extensions.httpcache.FilesystemCacheStorage'
-# REDIRECT_MAX_TIMES=100
