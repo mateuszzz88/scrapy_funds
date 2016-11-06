@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 import datetime
 import re
-from report.models import Policy, PolicyOperation, PolicyOperationDetail
-from collections import defaultdict
+from report.models import Policy, PolicyOperation
 from pprint import pprint as pp
 
 from crawler.scrapy_openlife.items import *
-import scrapy
 PATT_DATE = re.compile(r'\d\d\d\d-\d\d-\d\d')
 
 
@@ -16,12 +14,6 @@ class OpenlifeSpider(scrapy.Spider):
     start_urls = (
         'https://portal.openlife.pl/frontend/login.html',
     )
-    needed_details = set()
-
-    with open('/tmp/failed_nometa.txt', 'w'), open('/tmp/failed1.txt', 'w') as f1, open('/tmp/failed2.txt', 'w') as f2, open('/tmp/requested.txt', 'w') as r, open('/tmp/good.txt', 'w') as g:
-        pass
-    with open('/tmp/history.txt', 'w'):
-        pass
 
     def parse(self, response):
         for policy in Policy.objects.filter(company='openlife'):
@@ -103,20 +95,14 @@ class OpenlifeSpider(scrapy.Spider):
         return date
 
     def on_account_history(self, response):
-        # TODO op_id trzeba wyciągać z wnętrza details_url, a nie z tego co user widzi
         next_page = response.xpath("//a[@id='linkNextPage']/@href").extract()
-        # self.debug(response)
         curr_page = int(response.xpath('//a[@class="activePage"]/text()').extract()[0].strip())
         expected_page = response.meta['wanted_page']
 
-        with open('/tmp/history.txt', 'a') as fil:
-            fil.write("curr %s, expected %s\n" % (curr_page, expected_page))
         if curr_page != expected_page:
             # retry with new _flowExecutionKey
             meta = reuse_meta(response, ['wanted_page'])
             url = response.url + '&_eventId=gotoPage&page=' + str(expected_page)
-            with open('/tmp/history.txt', 'a') as fil:
-                fil.write("RErequesting next %s (%s)\n" % (str(expected_page), url))
             yield scrapy.Request(url,
                                  callback=self.on_account_history,
                                  meta=meta,
@@ -129,17 +115,12 @@ class OpenlifeSpider(scrapy.Spider):
             meta = reuse_meta(response)
             meta['wanted_page'] = curr_page + 1
 
-            with open('/tmp/history.txt', 'a') as fil:
-                fil.write("requesting next %s (%s)\n" % (str(curr_page + 1), next_page))
             yield scrapy.Request(next_page,
                                  callback=self.on_account_history,
                                  meta=meta,
                                  dont_filter=True)
 
-        last_date = (PolicyOperation.latest_date(response.meta['policy'])
-                     or datetime.date(year=2000, month=1, day=1)).strftime("%Y-%m-%d")
         entries = response.xpath("//div[@class='boxContent_lvl2']/div/table/tbody/tr")
-        # self.debug(response)
         for entry in entries:
             fields = [e.extract().strip() for e in entry.xpath('td/text()')]
             _, visible_op_id, op_date, op_type, op_amount, _, _, details, _ = fields
