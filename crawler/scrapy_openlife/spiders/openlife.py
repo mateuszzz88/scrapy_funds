@@ -160,7 +160,8 @@ class OpenlifeSpider(scrapy.Spider):
 
     @staticmethod
     def moneyparse(money):
-        return float(money.replace(',', '.').replace(' ', ''))
+        ret = float(money.replace(',', '.').replace(' ', '').replace(u'\xa0','').replace('PLN', ''))
+        return ret
 
 
     def debug(self, response=None, inspect=False, view=True):

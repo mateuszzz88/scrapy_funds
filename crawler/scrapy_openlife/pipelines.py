@@ -48,7 +48,10 @@ class DjangoDbPipeline(object):
     @staticmethod
     def process_HistoryDetail(item):
         policy = item['policy']
-        fund = policy.investmentfund_set.filter(name__startswith=item['fund_name'])[0]
+        if item['fund_name'] == '(none)':
+            fund, _ = InvestmentFund.objects.get_or_create(policy=policy, name=item['fund_name'])
+        else:
+            fund = policy.investmentfund_set.filter(name__startswith=item['fund_name'])[0]
         operation = PolicyOperation.objects.filter(policy=policy, operation_id=item['op_id'])[0]
 
         PolicyOperationDetail.objects.update_or_create(operation=operation,
