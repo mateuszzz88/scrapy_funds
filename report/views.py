@@ -24,7 +24,7 @@ def policy_details(request, policy_id):
             else: return -1
 
     policy = get_object_or_404(Policy, pk=policy_id)
-    funds_list = policy.investmentfund_set.all()
+    funds_list = policy.investmentfund_set.exclude(name='(none)')
     funds_list = sorted(funds_list, cmp=cmpfun)
     # funds_list = sorted(funds_list, key=operator.attrgetter('name'))
 

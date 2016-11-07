@@ -18,7 +18,7 @@ class Policy(models.Model):
 
     def last_value(self):
         funds = [fund for fund in self.investmentfund_set.all()]
-        last_days = [fund.edge_datapoints()[1].price_date for fund in funds]
+        last_days = [fund.edge_datapoints()[1].price_date for fund in funds if fund.edge_datapoints() is not None]
         last_day = max(last_days)
         last_dps = DataPoint.objects.filter(fund__policy=self, price_date=last_day)
         last_vals = [dp.value for dp in last_dps]
@@ -43,7 +43,7 @@ class InvestmentFund(models.Model):
 
     def edge_datapoints(self):
         dps = self.datapoint_set.order_by('price_date')
-        return dps[0], dps[dps.count()-1]
+        return (dps[0], dps[dps.count()-1]) if dps else None
 
     def __unicode__(self):
         if self.datapoint_set.all():
