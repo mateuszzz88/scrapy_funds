@@ -1,4 +1,4 @@
-
+{% load report_extra %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -38,7 +38,14 @@
                     { "date" : "{{data_point.price_date|date:"Y-m-d"}}",
                     "unit_price" : {{data_point.unit_price}} ,
                     "value" : {{data_point.value}} ,
-                    "return_percent" : ({{data_point.unit_price}}*100/{{data_list.last.unit_price}}).toFixed(2) },
+                    "return_percent" : ({{data_point.unit_price}}*100/{{data_list.last.unit_price}}).toFixed(2),
+                    {% if data_point.price_date in operations %}
+                        "customBullet" : "{% static operations|operation_bullet:data_point.price_date %}",
+                        "balloonText"  : "<b>{{        operations|operation_balloon:data_point.price_date }}</b>"
+                    {% else %}
+                        "balloonText"  : "{{data_point.value}}"
+                    {% endif %}
+                    },
                 {% endfor %}
             ]
     AmCharts.makeChart("chart1",
@@ -65,7 +72,10 @@
                     "valueAxis":"ValueAxis-1"
                 },
                 {
+                    "balloonText"  : "[[balloonText]]",
                     "bullet": "none",
+                    "bulletSize": 14,
+                    "customBulletField": "customBullet",
                     "id": "AmGraph-2",
                     "title": "Total value [{{data_list.0.currency}}]",
                     "valueField": "value",
@@ -86,7 +96,6 @@
                 }
             ],
             "allLabels": [],
-            "balloon": {},
             "legend": {
                 "enabled": true,
                 "useGraphSettings": true,

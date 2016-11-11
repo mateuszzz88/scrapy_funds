@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import get_object_or_404, render
 from pprint import pprint as pp
+from collections import defaultdict
 
 from .models import *
 
@@ -68,8 +69,16 @@ def policy_details(request, policy_id):
 def fund_details(request,  fund_id):
     fund = get_object_or_404(InvestmentFund, pk=fund_id)
     data_list = DataPoint.objects.filter(fund=fund).order_by('-price_date')
+    operations = [(od.operation.operation_date, od.money_transfer, od.operation.operation_type)
+                  for od in fund.policyoperationdetail_set.order_by('operation__operation_date')]
+    operations_dict = defaultdict(lambda : defaultdict(float))
+    for op_date, op_transfer, op_type in operations:
+        operations_dict[op_date][op_type] += op_transfer
+    # TODO change to normal dicts
+    # import pdb; pdb.set_trace()
     context = {'fund_name': fund.name,
-               'data_list': data_list}
+               'data_list': data_list,
+               'operations': operations_dict}
     return render(request, 'report/fund_details.html', context)
 
 
