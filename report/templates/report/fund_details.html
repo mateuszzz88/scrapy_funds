@@ -39,6 +39,7 @@
                     "unit_price" : {{data_point.unit_price}} ,
                     "value" : {{data_point.value}} ,
                     "return_percent" : ({{data_point.unit_price}}*100/{{data_list.last.unit_price}}).toFixed(2),
+                    "current_unit_value" : {{data_point.unit_price}},
                     {% if data_point.price_date in operations %}
                         "customBullet" : "{% static operations|operation_bullet:data_point.price_date %}",
                         "balloonText"  : "<b>{{        operations|operation_balloon:data_point.price_date }}</b>"
@@ -65,6 +66,7 @@
             "trendLines": [],
             "graphs": [
                 {
+                    "balloonText"  : "[[value]] %<br/>[[current_unit_value]] PLN",
                     "bullet": "none",
                     "id": "AmGraph-1",
                     "title": "Unit relative [%]",
