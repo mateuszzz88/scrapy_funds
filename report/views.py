@@ -33,7 +33,8 @@ def policy_details(request, policy_id):
     data = collections.defaultdict(dict)
     for dp in DataPoint.objects.filter(fund__in=funds_list):
         data[dp.price_date][dp.fund.name] = dp.value
-    paid_data = policy.policyoperation_set.filter(operation_type=PolicyOperation.DEPOSIT).order_by('operation_date')
+    OP_TYPES = [PolicyOperation.DEPOSIT, PolicyOperation.WITHDRAW]
+    paid_data = policy.policyoperation_set.filter(operation_type__in=OP_TYPES).order_by('operation_date')
     paid_data_dates = [op.operation_date for op in paid_data]
     paid_data_amounts = [op.operation_amount for op in paid_data]
     paid_data_sums = [sum(paid_data_amounts[0:i+1]) for i in range(len(paid_data))]
