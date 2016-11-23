@@ -7,6 +7,11 @@ from pprint import pprint as pp
 from crawler.scrapy_openlife.items import *
 PATT_DATE = re.compile(r'\d\d\d\d-\d\d-\d\d')
 
+OVERRIDE_POLICY = None  # 'Aneta'
+OVERRIDE_DATE_FROM = None  # '2012-05-01'
+OVERRIDE_DATE_TO = None  # '2013-10-16'
+
+
 
 class OpenlifeSpider(scrapy.Spider):
     name = "openlife"
@@ -16,7 +21,10 @@ class OpenlifeSpider(scrapy.Spider):
     )
 
     def parse(self, response):
-        for policy in Policy.objects.filter(company='openlife'):
+        policys = Policy.objects.filter(company='openlife')
+        if OVERRIDE_POLICY:
+            policys = [Policy.objects.get(name=OVERRIDE_POLICY)]
+        for policy in policys:
             login = policy.login
             password = policy.password
             yield scrapy.FormRequest.from_response(response,
@@ -48,6 +56,10 @@ class OpenlifeSpider(scrapy.Spider):
         date_from = response.meta['date_from']
         min_date = datetime.datetime.strptime(date_from, "%Y-%m-%d").date()
         max_date = datetime.date.today()  # TODO this should be read from page/meta
+        if OVERRIDE_DATE_FROM:
+            min_date = datetime.datetime.strptime(OVERRIDE_DATE_FROM, "%Y-%m-%d").date()
+        if OVERRIDE_DATE_TO:
+            max_date = datetime.datetime.strptime(OVERRIDE_DATE_TO, "%Y-%m-%d").date()
         meta = reuse_meta(response)
         meta['wanted_page'] = 1
         yield scrapy.Request('https://portal.openlife.pl/frontend/secure/accountHistory.html',
