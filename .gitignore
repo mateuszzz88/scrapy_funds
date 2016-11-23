@@ -8,3 +8,4 @@ db.sqlite3
 .idea/
 127.0.0.1:8000
 report.zip
+db.sqlite3-journal
