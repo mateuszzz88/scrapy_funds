@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 import re
-from report.models import Policy, PolicyOperation
+from report.models import DataPoint, InvestmentFund, Policy, PolicyOperation
 from pprint import pprint as pp
 
 from crawler.scrapy_openlife.items import *
@@ -73,6 +73,11 @@ class OpenlifeSpider(scrapy.Spider):
             amount, unitprice, value = [float(e.replace(',', '.').replace(u'\xa0', '')) for e in
                                         [amount, unitprice, value]]
 
+            fund = InvestmentFund.objects.filter(name=name, policy=response.meta['policy']).first()
+            if fund:
+                item = DataPoint.objects.filter(price_date=pricedate, fund=fund).first()
+                if item:
+                    continue
             item = ScrapyOpenlifeItem()
             item['name'] = name
             item['amount'] = amount
@@ -131,6 +136,8 @@ class OpenlifeSpider(scrapy.Spider):
             if not operation:
                 op_type = op_type.encode('utf-8')
                 op_amount = float(op_amount.replace(',', '.').replace(u'\xa0', ''))
+                if op_type.decode('utf-8') in [PolicyOperation.CHARGE, PolicyOperation.WITHDRAW]:
+                    op_amount = -op_amount
                 item = ScrapyOpenlifeHistoryItem()
                 item['id'] = op_id
                 item['date'] = op_date
@@ -158,7 +165,7 @@ class OpenlifeSpider(scrapy.Spider):
 def daterange(start_date, end_date):
     from datetime import timedelta
     for n in range(int((end_date - start_date).days)):
-        day = start_date + timedelta(n)
+        day = end_date - timedelta(n)
         if day.weekday() < 5:
             yield day
 

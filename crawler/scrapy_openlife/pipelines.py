@@ -37,8 +37,6 @@ class DjangoDbPipeline(object):
 
     @staticmethod
     def process_HistoryItem(item):
-        if item['amount'] > 29000:  # TODO this is dirty hack to work around parents' multiple policies
-            return
         PolicyOperation.objects.update_or_create(operation_id=item['id'],
                                                  operation_amount=item['amount'],
                                                  operation_type=item['type'],

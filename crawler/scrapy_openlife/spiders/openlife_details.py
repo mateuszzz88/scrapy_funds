@@ -27,7 +27,8 @@ class OpenlifeDetailsSpider(OpenlifeSpider):
     def optype_translate(optype):
         dct = {u'Opłata' : 'charge',
                u'Wpłaty' : 'payment',
-               u'Przeniesienie' : 'transfer'}
+               u'Przeniesienie' : 'transfer',
+               u'Wypłaty' : 'withdrawal'}
         return dct[optype]
 
     def pop_details(self, response):
@@ -88,7 +89,7 @@ class OpenlifeDetailsSpider(OpenlifeSpider):
                                  dont_filter=True)
             return
 
-        OPLATA, WPLATA, PRZENIESIENIE = 'charge', 'payment', 'transfer'
+        OPLATA, WPLATA, PRZENIESIENIE, WYPLATA = 'charge', 'payment', 'transfer', 'withdrawal'
         if op_type == OPLATA:
             entries = response.xpath("//div/div/table/tbody/tr")
 
@@ -115,6 +116,21 @@ class OpenlifeDetailsSpider(OpenlifeSpider):
                 item['op_id'] = op_id
                 item['fund_name'] = fund_name
                 item['money_transfer'] = OpenlifeSpider.moneyparse(money)
+                item['policy'] = response.meta['policy']
+                yield item
+            if not entries:
+                yield self.empty_item(response, op_id)
+
+        elif op_type == WYPLATA:
+            scrapy.utils.response.open_in_browser(response)
+            entries = response.xpath("//div/div/table/tr")
+            for entry in entries:
+                fields = [e.extract().strip() for e in entry.xpath('td/text()|td/nobr/text()')]
+                _, fund_name, _, _, _, _, _, money, _, _ = fields
+                item = ScrapyOpenlifeHistoryItemDetail()
+                item['op_id'] = op_id
+                item['fund_name'] = fund_name
+                item['money_transfer'] = -OpenlifeSpider.moneyparse(money)
                 item['policy'] = response.meta['policy']
                 yield item
             if not entries:

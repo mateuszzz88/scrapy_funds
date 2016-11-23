@@ -70,7 +70,7 @@ class DataPoint(models.Model):
     @classmethod
     def latest_date(cls, policy):
         funds = policy.investmentfund_set.all()
-        last = sorted([fund.datapoint_set.order_by('-price_date').first().price_date for fund in funds])[-1]
+        last = sorted([fund.datapoint_set.order_by('-price_date').first().price_date for fund in funds if fund.name != '(none)'])[-1]
         # last = cls.objects.order_by('-price_date').first()
         return last
 
@@ -109,3 +109,5 @@ class PolicyOperationDetail(models.Model):
 
 PolicyOperation.DEPOSIT = u'Wp\u0142aty'
 PolicyOperation.WITHDRAW = u'Wyp\u0142aty'
+PolicyOperation.TRANSIT = u'Przeniesienie'
+PolicyOperation.CHARGE = u'Op\u0142ata'
