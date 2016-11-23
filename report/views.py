@@ -88,3 +88,18 @@ def policy_list(request):
     # import pdb; pdb.set_trace()
     context = {'policies': policies}
     return render(request, 'report/policy_list.html', context)
+
+def export(request):
+    dirname = '127.0.0.1:8000'
+    import shutil, os
+    if os.path.isdir(dirname):
+        shutil.rmtree(dirname)
+    if os.path.exists('report.zip'):
+        os.remove('report.zip')
+
+    import subprocess
+    subprocess.call(['wget', '-mcpk', 'http://127.0.0.1:8000/report/'])
+    shutil.make_archive('report', 'zip', root_dir=dirname)
+
+    from django.http import HttpResponse
+    return HttpResponse('exported')

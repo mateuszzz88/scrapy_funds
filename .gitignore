@@ -6,3 +6,5 @@ credentials
 db.sqlite3
 *.log
 .idea/
+127.0.0.1:8000
+report.zip
