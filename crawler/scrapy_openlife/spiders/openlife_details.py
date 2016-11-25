@@ -122,7 +122,6 @@ class OpenlifeDetailsSpider(OpenlifeSpider):
                 yield self.empty_item(response, op_id)
 
         elif op_type == WYPLATA:
-            scrapy.utils.response.open_in_browser(response)
             entries = response.xpath("//div/div/table/tr")
             for entry in entries:
                 fields = [e.extract().strip() for e in entry.xpath('td/text()|td/nobr/text()')]
