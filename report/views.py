@@ -92,14 +92,35 @@ def policy_list(request):
 def export(request):
     dirname = '127.0.0.1:8000'
     import shutil, os
+    # clean after previous
     if os.path.isdir(dirname):
         shutil.rmtree(dirname)
     if os.path.exists('report.zip'):
         os.remove('report.zip')
 
+    # download page
     import subprocess
     subprocess.call(['wget', '-mcpk', 'http://127.0.0.1:8000/report/'])
+
+    # copy missing files
+    srcdir = 'report/static/report'
+    dstdir = '127.0.0.1:8000/static/report'
+    for f in os.listdir(srcdir):
+        shutil.copy(os.path.join(srcdir, f), os.path.join(dstdir, f))
+
+    # fix links
+    for dirpath, _, filenames in os.walk(dirname):
+        for fname in filenames:
+            fname = os.path.join(dirpath, fname)
+            with open(fname) as f:
+                html = f.read()
+            html = html.replace('"customBullet" : "/static/report', '"customBullet" : "../../../static/report')
+            with open(fname, 'w') as f:
+                f.write(html)
+
+    # export to zip
     shutil.make_archive('report', 'zip', root_dir=dirname)
 
+    # show sth on the browser
     from django.http import HttpResponse
     return HttpResponse('exported')
